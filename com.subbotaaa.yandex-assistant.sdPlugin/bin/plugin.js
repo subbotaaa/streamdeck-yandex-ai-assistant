@@ -18,6 +18,89 @@ const MAX_RECORD_MS = 29_000; // SpeechKit sync STT limit is 30 s / 1 MB
 const MIN_RECORD_MS = 400;
 
 // ---------------------------------------------------------------------------
+// Runtime localization (RU/EN). Language: per-button setting, or OS language.
+// ---------------------------------------------------------------------------
+const RUNTIME_I18N = {
+	ru: {
+		setupTitle: "Yandex AI Assistant — настройка",
+		setupMsg: "Не заданы API-ключ и Folder ID. Откройте настройки кнопки в Stream Deck и заполните их.",
+		recErrTitle: "Ошибка записи",
+		errTitle: "Ошибка Yandex AI Assistant",
+		appTitle: "Yandex AI Assistant",
+		sttEmpty: "Речь не распознана — попробуйте ещё раз, говорите ближе к микрофону.",
+		tooShort: "Слишком\nкоротко",
+		youPrefix: "Вы: ",
+		micPrefix: "Микрофон: ",
+		badWav: "Некорректный WAV-файл записи",
+		emptyWav: "Пустая запись (нет данных с микрофона)",
+		emptyAnswer: "Модель вернула пустой ответ",
+		customMissing: "Выбрана «Своя модель», но её имя не заполнено в настройках.",
+		codeSkipped: " (фрагмент кода пропущен) ",
+		journalFile: "YandexAssistant-журнал.md",
+		journalHeader: "# Журнал диалогов Yandex AI Assistant\n",
+		journalEmpty: "\n(пока пусто — задайте первый вопрос)\n",
+		jYou: "**Вы:**", jBot: "**Ассистент:**",
+		testSys: "Отвечай одним словом.",
+		testAsk: "Скажи «готово»",
+		testOk: "Подключение работает. Ответ модели: ",
+		sysPrompt: "Ты голосовой ассистент-эрудит. У тебя НЕТ доступа к интернету и поиску — " +
+			"никогда не предлагай «найти информацию» или «поискать». Всегда отвечай на основе " +
+			"собственных знаний. Если точных сведений нет, дай наиболее вероятный ответ и честно " +
+			"отметь, в чём не уверен. Отвечай по делу, обычным текстом без markdown-разметки.",
+	},
+	en: {
+		setupTitle: "Yandex AI Assistant — setup",
+		setupMsg: "API key and Folder ID are not set. Open the key's settings in Stream Deck and fill them in.",
+		recErrTitle: "Recording error",
+		errTitle: "Yandex AI Assistant error",
+		appTitle: "Yandex AI Assistant",
+		sttEmpty: "Speech was not recognized — try again, speak closer to the microphone.",
+		tooShort: "Too\nshort",
+		youPrefix: "You: ",
+		micPrefix: "Microphone: ",
+		badWav: "Invalid WAV recording file",
+		emptyWav: "Empty recording (no microphone data)",
+		emptyAnswer: "The model returned an empty answer",
+		customMissing: "\"Custom model\" is selected, but its name is empty in the settings.",
+		codeSkipped: " (code fragment skipped) ",
+		journalFile: "YandexAssistant-journal.md",
+		journalHeader: "# Yandex AI Assistant dialogue journal\n",
+		journalEmpty: "\n(empty so far — ask your first question)\n",
+		jYou: "**You:**", jBot: "**Assistant:**",
+		testSys: "Answer with a single word.",
+		testAsk: "Say \"ready\"",
+		testOk: "Connection works. Model answer: ",
+		sysPrompt: "You are an erudite voice assistant. You have NO internet or search access — " +
+			"never offer to \"look something up\". Always answer from your own knowledge. If you lack " +
+			"precise information, give the most likely answer and honestly note your uncertainty. " +
+			"Be concise, respond in plain text without markdown.",
+	},
+};
+let systemLang = "en";
+function langOf(settings) {
+	const pref = settings?.uiLang;
+	if (pref === "ru" || pref === "en") return pref;
+	return systemLang;
+}
+function tr(settings, key) {
+	return RUNTIME_I18N[langOf(settings)][key] ?? RUNTIME_I18N.en[key];
+}
+// detect OS language once at startup (used when the button is set to "auto")
+(function detectSystemLanguage() {
+	try {
+		const p = spawn(
+			"powershell.exe",
+			["-NoLogo", "-NoProfile", "-Command", "(Get-Culture).TwoLetterISOLanguageName"],
+			{ stdio: ["ignore", "pipe", "ignore"], windowsHide: true }
+		);
+		let out = "";
+		p.stdout.setEncoding("utf8");
+		p.stdout.on("data", (d) => { out += d; });
+		p.on("exit", () => { if (out.trim().toLowerCase() === "ru") systemLang = "ru"; });
+	} catch {}
+})();
+
+// ---------------------------------------------------------------------------
 // Command-line registration parameters supplied by the Stream Deck app
 // ---------------------------------------------------------------------------
 function argValue(flag) {
@@ -166,7 +249,7 @@ class Recorder {
 		this.ensure();
 		this.proc.stdin.write(cmd + "\r\n");
 		const reply = await this.readLine(timeoutMs);
-		if (reply.startsWith("ERR")) throw new Error(`Микрофон: ${reply.slice(4)}`);
+		if (reply.startsWith("ERR")) throw new Error(RUNTIME_I18N[systemLang].micPrefix + reply.slice(4));
 		return reply;
 	}
 
@@ -230,9 +313,9 @@ function listDevices() {
 // ---------------------------------------------------------------------------
 // Dialogue journal (markdown file in the user's Documents folder)
 // ---------------------------------------------------------------------------
-let journalPathCache = null;
-async function journalPath() {
-	if (journalPathCache) return journalPathCache;
+let docsDirCache = null;
+async function journalPath(settings) {
+	if (docsDirCache) return path.join(docsDirCache, tr(settings, "journalFile"));
 	const docs = await new Promise((resolve) => {
 		const p = spawn(
 			"powershell.exe",
@@ -246,28 +329,28 @@ async function journalPath() {
 		p.on("exit", () => resolve(out.trim()));
 		p.on("error", () => resolve(""));
 	});
-	const dir = docs && fs.existsSync(docs) ? docs : os.homedir();
-	journalPathCache = path.join(dir, "YandexAssistant-журнал.md");
-	return journalPathCache;
+	docsDirCache = docs && fs.existsSync(docs) ? docs : os.homedir();
+	return path.join(docsDirCache, tr(settings, "journalFile"));
 }
 
 async function appendJournal(settings, question, answer) {
 	if (settings.journal === false) return;
 	try {
-		const file = await journalPath();
-		const stamp = new Date().toLocaleString("ru-RU", { dateStyle: "short", timeStyle: "short" });
-		let entry = `\n### ${stamp}\n\n**Вы:** ${question}\n\n**Ассистент:** ${answer}\n`;
-		if (!fs.existsSync(file)) entry = "\uFEFF" + `# Журнал диалогов Yandex AI Assistant\n${entry}`;
+		const file = await journalPath(settings);
+		const locale = langOf(settings) === "ru" ? "ru-RU" : "en-US";
+		const stamp = new Date().toLocaleString(locale, { dateStyle: "short", timeStyle: "short" });
+		let entry = `\n### ${stamp}\n\n${tr(settings, "jYou")} ${question}\n\n${tr(settings, "jBot")} ${answer}\n`;
+		if (!fs.existsSync(file)) entry = "\uFEFF" + tr(settings, "journalHeader") + entry;
 		fs.appendFileSync(file, entry, "utf8");
 	} catch (e) {
 		log(`journal write failed: ${e.message}`);
 	}
 }
 
-async function openJournal() {
-	const file = await journalPath();
+async function openJournal(settings) {
+	const file = await journalPath(settings);
 	if (!fs.existsSync(file)) {
-		fs.writeFileSync(file, "\uFEFF# Журнал диалогов Yandex AI Assistant\n\n(пока пусто — задайте первый вопрос)\n", "utf8");
+		fs.writeFileSync(file, "\uFEFF" + tr(settings, "journalHeader") + tr(settings, "journalEmpty"), "utf8");
 	}
 	spawn("cmd.exe", ["/c", "start", "", file], { stdio: "ignore", windowsHide: true });
 }
@@ -297,9 +380,9 @@ function toastSeconds(settings) {
 // ---------------------------------------------------------------------------
 // WAV utilities
 // ---------------------------------------------------------------------------
-function parseWav(buf) {
+function parseWav(buf, settings) {
 	if (buf.length < 44 || buf.toString("ascii", 0, 4) !== "RIFF" || buf.toString("ascii", 8, 12) !== "WAVE") {
-		throw new Error("Некорректный WAV-файл записи");
+		throw new Error(tr(settings, "badWav"));
 	}
 	let offset = 12;
 	let sampleRate = 16000;
@@ -311,7 +394,7 @@ function parseWav(buf) {
 		if (id === "data") { pcm = buf.subarray(offset + 8, offset + 8 + size); break; }
 		offset += 8 + size + (size % 2);
 	}
-	if (!pcm || pcm.length === 0) throw new Error("Пустая запись (нет данных с микрофона)");
+	if (!pcm || pcm.length === 0) throw new Error(tr(settings, "emptyWav"));
 	return { sampleRate, pcm };
 }
 
@@ -403,7 +486,7 @@ function resolveModelUri(settings) {
 	const model = settings.model || "yandexgpt-lite";
 	if (model === "custom") {
 		const custom = (settings.customModel || "").trim();
-		if (!custom) throw new Error("Выбрана «Своя модель», но её имя не заполнено в настройках.");
+		if (!custom) throw new Error(tr(settings, "customMissing"));
 		if (custom.startsWith("gpt://")) return custom;
 		return `gpt://${settings.folderId}/${custom}${custom.includes("/") ? "" : "/latest"}`;
 	}
@@ -415,13 +498,7 @@ async function askGpt(settings, question, hist = []) {
 	if (settings.sysPrompt && settings.sysPrompt.trim()) {
 		messages.push({ role: "system", content: settings.sysPrompt.trim() });
 	} else {
-		messages.push({
-			role: "system",
-			content: "Ты голосовой ассистент-эрудит. У тебя НЕТ доступа к интернету и поиску — " +
-				"никогда не предлагай «найти информацию» или «поискать». Всегда отвечай на основе " +
-				"собственных знаний. Если точных сведений нет, дай наиболее вероятный ответ и честно " +
-				"отметь, в чём не уверен. Отвечай по делу, обычным текстом без markdown-разметки.",
-		});
+		messages.push({ role: "system", content: tr(settings, "sysPrompt") });
 	}
 	for (const pair of hist) {
 		messages.push({ role: "user", content: pair.q });
@@ -444,12 +521,12 @@ async function askGpt(settings, question, hist = []) {
 			messages,
 		}),
 	}, 120_000);
-	if (!res.ok) throw new Error(`Модель ${res.status}: ${(await res.text()).slice(0, 300)}`);
+	if (!res.ok) throw new Error(`LLM ${res.status}: ${(await res.text()).slice(0, 300)}`);
 	const data = await res.json();
 	let text = data?.choices?.[0]?.message?.content || "";
 	// reasoning models may embed their chain of thought in <think> tags
 	text = text.replace(/<think>[\s\S]*?<\/think>/g, "").trim();
-	if (!text) throw new Error("Модель вернула пустой ответ");
+	if (!text) throw new Error(tr(settings, "emptyAnswer"));
 	return text;
 }
 
@@ -495,9 +572,9 @@ async function textToSpeech(settings, text) {
 }
 
 // Markdown artifacts sound bad when spoken aloud
-function cleanForSpeech(text) {
+function cleanForSpeech(text, settings) {
 	return text
-		.replace(/```[\s\S]*?```/g, " (фрагмент кода пропущен) ")
+		.replace(/```[\s\S]*?```/g, tr(settings, "codeSkipped"))
 		.replace(/[*_`#>|]+/g, "")
 		.replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
 		.replace(/\s{2,}/g, " ")
@@ -515,7 +592,7 @@ let autoStopTimer = null;
 
 function validateSettings(s) {
 	if (!s || !s.apiKey || !s.folderId) {
-		return "Не заданы API-ключ и Folder ID. Откройте настройки кнопки в Stream Deck и заполните их.";
+		return tr(s, "setupMsg");
 	}
 	return null;
 }
@@ -525,7 +602,7 @@ async function onKeyDown(context) {
 	const err = validateSettings(settings);
 	if (err) {
 		showAlert(context);
-		showToast("Yandex AI Assistant — настройка", err, false, 8);
+		showToast(tr(settings, "setupTitle"), err, false, 8);
 		return;
 	}
 	// toggle mode: the second press stops the recording and processes it
@@ -552,7 +629,7 @@ async function onKeyDown(context) {
 		setImage(context, IMG_IDLE);
 		showAlert(context);
 		log(`start recording failed: ${e.message}`);
-		showToast("Ошибка записи", String(e.message), false, 8);
+		showToast(tr(settings, "recErrTitle"), String(e.message), false, 8);
 	}
 }
 
@@ -573,7 +650,7 @@ async function stopAndProcess(context, isAutoStop = false) {
 	if (duration < MIN_RECORD_MS) {
 		await recorder.cancel();
 		setImage(context, IMG_IDLE);
-		setTitle(context, "Слишком\nкоротко");
+		setTitle(context, tr(settings, "tooShort"));
 		setTimeout(() => setTitle(context, ""), 2500);
 		return;
 	}
@@ -586,12 +663,12 @@ async function stopAndProcess(context, isAutoStop = false) {
 		try { fs.unlinkSync(wavFile); } catch {}
 		await recorder.stop(wavFile);
 		if (settings.beeps !== false) recorder.beep(700, 90);
-		const { sampleRate, pcm } = parseWav(fs.readFileSync(wavFile));
+		const { sampleRate, pcm } = parseWav(fs.readFileSync(wavFile), settings);
 
 		const question = await speechToText(settings, pcm, sampleRate);
 		if (!question) {
 			showAlert(context);
-			showToast("Yandex AI Assistant", "Речь не распознана — попробуйте ещё раз, говорите ближе к микрофону.", false);
+			showToast(tr(settings, "appTitle"), tr(settings, "sttEmpty"), false);
 			return;
 		}
 		log(`question: ${question}`);
@@ -603,10 +680,10 @@ async function stopAndProcess(context, isAutoStop = false) {
 
 		const mode = settings.mode || "voice";
 		if (mode === "text" || mode === "both") {
-			showToast(`Вы: ${question.slice(0, 80)}`, answer, settings.copyClipboard !== false, toastSeconds(settings));
+			showToast(tr(settings, "youPrefix") + question.slice(0, 80), answer, settings.copyClipboard !== false, toastSeconds(settings));
 		}
 		if (mode === "voice" || mode === "both") {
-			const speech = cleanForSpeech(answer);
+			const speech = cleanForSpeech(answer, settings);
 			if (speech) {
 				const wav = await textToSpeech(settings, speech);
 				const answerFile = path.join(TMP, "answer.wav");
@@ -625,7 +702,7 @@ async function stopAndProcess(context, isAutoStop = false) {
 	} catch (e) {
 		log(`processing failed: ${e.message}`);
 		showAlert(context);
-		showToast("Ошибка Yandex AI Assistant", String(e.message), false, 8);
+		showToast(tr(settings, "errTitle"), String(e.message), false, 8);
 	} finally {
 		busy = false;
 		// don't clobber the "recording" image if a new press already started
@@ -641,8 +718,8 @@ async function runTest(context, piContext, actionUUID) {
 	const err = validateSettings(settings);
 	if (err) return reply({ event: "testResult", ok: false, message: err });
 	try {
-		const answer = await askGpt({ ...settings, sysPrompt: "Отвечай одним словом." }, "Скажи «готово»");
-		reply({ event: "testResult", ok: true, message: `Подключение работает. Ответ модели: ${answer.slice(0, 60)}` });
+		const answer = await askGpt({ ...settings, sysPrompt: tr(settings, "testSys") }, tr(settings, "testAsk"));
+		reply({ event: "testResult", ok: true, message: tr(settings, "testOk") + answer.slice(0, 60) });
 	} catch (e) {
 		reply({ event: "testResult", ok: false, message: String(e.message) });
 	}
@@ -690,7 +767,7 @@ ws.on("message", (raw) => {
 					})
 				);
 			}
-			if (payload?.cmd === "openJournal") openJournal();
+			if (payload?.cmd === "openJournal") openJournal(contextSettings.get(context) || {});
 			if (payload?.cmd === "clearHistory") {
 				delete history[context];
 				saveHistory();

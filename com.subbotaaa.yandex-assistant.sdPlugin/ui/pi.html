@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<title>Yandex AI Assistant — настройки</title>
+<title>Yandex AI Assistant — settings</title>
 <style>
 	:root { color-scheme: dark; }
 	html, body {
@@ -31,8 +31,8 @@
 	input[type=range] { width: calc(100% - 44px); vertical-align: middle; }
 	.range-val { display: inline-block; width: 36px; text-align: right; color: #bdbdbd; }
 	.check { display: flex; align-items: center; gap: 6px; padding-top: 3px; }
+	.check label { flex: none; text-align: left; padding: 0; color: #d8d8d8; }
 	.hint { color: #7a7a7a; font-size: 8pt; margin: 2px 0 0; line-height: 1.35; }
-	.hint a { color: #6ea3f5; text-decoration: none; }
 	button {
 		background: #3d3d3d; color: #e6e6e6; border: 1px solid #232323;
 		border-radius: 4px; padding: 5px 14px; cursor: pointer; font-size: 9pt;
@@ -64,11 +64,21 @@
 <div class="wrapper">
 
 	<div class="item">
-		<label for="apiKey">API-ключ</label>
+		<label for="uiLang">Language / Язык</label>
+		<div class="value">
+			<select id="uiLang">
+				<option value="auto">Auto</option>
+				<option value="ru">Русский</option>
+				<option value="en">English</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="item">
+		<label for="apiKey" data-i18n="apiKey"></label>
 		<div class="value">
 			<input type="password" id="apiKey" placeholder="AQVN...">
-			<p class="hint">API-ключ сервисного аккаунта Yandex Cloud с ролями
-			ai.speechkit-stt.user, ai.speechkit-tts.user, ai.languageModels.user</p>
+			<p class="hint" data-i18n="apiKeyHint"></p>
 		</div>
 	</div>
 
@@ -76,110 +86,83 @@
 		<label for="folderId">Folder ID</label>
 		<div class="value">
 			<input type="text" id="folderId" placeholder="b1g...">
-			<p class="hint">Идентификатор каталога в Yandex Cloud (консоль → каталог → ID)</p>
+			<p class="hint" data-i18n="folderHint"></p>
 		</div>
 	</div>
 
 	<div class="item">
 		<label></label>
 		<div class="value">
-			<button id="btnHowto">📖 Как получить API-ключ и Folder ID</button>
-			<div id="howto">
-				<ol>
-					<li>Войдите в <b>консоль Yandex Cloud</b> (нужен аккаунт Яндекса и активный
-						платёжный аккаунт — создаётся там же, в разделе «Биллинг»).</li>
-					<li>Откройте или создайте <b>каталог</b> (folder). Его идентификатор вида
-						<code>b1g...</code> показан в списке каталогов и в адресной строке —
-						скопируйте его в поле <b>Folder ID</b>.</li>
-					<li>Слева выберите <b>Сервисные аккаунты</b> → «Создать сервисный аккаунт».
-						При создании добавьте роли:
-						<code>ai.speechkit-stt.user</code>, <code>ai.speechkit-tts.user</code>,
-						<code>ai.languageModels.user</code>.</li>
-					<li>Откройте созданный аккаунт → вкладка <b>«API-ключи»</b> →
-						«Создать API-ключ». Скопируйте <b>секрет</b> (строка вида
-						<code>AQVN...</code>) — он показывается только один раз! Вставьте его
-						в поле <b>API-ключ</b>.</li>
-					<li>Нажмите <b>«Проверить подключение»</b> внизу этой панели.</li>
-				</ol>
-				<div class="linkrow">
-					<button data-url="https://console.yandex.cloud/">🌐 Открыть консоль</button>
-					<button data-url="https://yandex.cloud/ru/docs/iam/operations/authentication/manage-api-keys#create-api-key">📄 Документация по API-ключам</button>
-				</div>
-			</div>
+			<button id="btnHowto" data-i18n="howtoBtn"></button>
+			<div id="howto"></div>
 		</div>
 	</div>
 
 	<div class="item">
-		<label for="model">Модель</label>
+		<label for="model" data-i18n="model"></label>
 		<div class="value">
 			<select id="model">
 				<optgroup label="YandexGPT">
-					<option value="yandexgpt-lite" selected>YandexGPT 5 Lite (быстрая, дешёвая)</option>
-					<option value="yandexgpt">YandexGPT 5 Pro</option>
-					<option value="yandexgpt-5.1">YandexGPT 5.1 Pro (новейшая)</option>
+					<option value="yandexgpt-lite" selected data-i18n="mLite"></option>
+					<option value="yandexgpt" data-i18n="mPro"></option>
+					<option value="yandexgpt-5.1" data-i18n="m51"></option>
 				</optgroup>
-				<optgroup label="Алиса AI">
-					<option value="aliceai-llm">Алиса AI</option>
-					<option value="aliceai-llm-flash">Алиса AI Flash (быстрая)</option>
+				<optgroup label="Alice AI" data-i18n-label="gAlice">
+					<option value="aliceai-llm" data-i18n="mAlice"></option>
+					<option value="aliceai-llm-flash" data-i18n="mAliceFlash"></option>
 				</optgroup>
-				<optgroup label="Открытые модели">
-					<option value="qwen3-235b-a22b-fp8">Qwen3 235B (эрудит — рекомендуется)</option>
-					<option value="deepseek-v32">DeepSeek V3.2 (рассуждающая, медленнее)</option>
-					<option value="deepseek-v4-flash">DeepSeek V4 Flash (рассуждающая)</option>
-					<option value="gpt-oss-120b">GPT-OSS 120B</option>
+				<optgroup label="Open models" data-i18n-label="gOpen">
+					<option value="qwen3-235b-a22b-fp8" data-i18n="mQwen"></option>
+					<option value="deepseek-v32" data-i18n="mDeepseek"></option>
+					<option value="deepseek-v4-flash" data-i18n="mDeepseekFlash"></option>
+					<option value="gpt-oss-120b" data-i18n="mGptOss"></option>
 				</optgroup>
-				<option value="custom">Своя модель…</option>
+				<option value="custom" data-i18n="mCustom"></option>
 			</select>
-			<p class="hint">Все модели работают с вашим API-ключом Yandex Cloud и оплачиваются
-			по тарифам Foundation Models / AI Studio.</p>
+			<p class="hint" data-i18n="modelHint"></p>
 		</div>
 	</div>
 
 	<div class="item" id="rowCustomModel" style="display:none">
-		<label for="customModel">Своя модель</label>
+		<label for="customModel" data-i18n="customModel"></label>
 		<div class="value">
-			<input type="text" id="customModel" placeholder="qwen3.6-35b-a3b или gpt://каталог/модель/latest">
-			<p class="hint">Имя модели из консоли Yandex Cloud (раздел AI Studio → Модели)
-			или полный URI. К короткому имени автоматически добавится /latest.</p>
+			<input type="text" id="customModel" placeholder="qwen3.6-35b-a3b">
+			<p class="hint" data-i18n="customModelHint"></p>
 		</div>
 	</div>
 
 	<div class="item">
-		<label for="sysPrompt">Системный
-промпт</label>
+		<label for="sysPrompt" data-i18n="sysPrompt"></label>
 		<div class="value">
-			<textarea id="sysPrompt" placeholder="Пусто — используется встроенный промпт: отвечать из собственных знаний, не предлагать «поискать в интернете»."></textarea>
-			<p class="hint">Если пишете свой промпт, добавьте в него: «У тебя нет доступа к интернету,
-			отвечай из собственных знаний» — иначе модель любит отказываться от ответа.</p>
+			<textarea id="sysPrompt"></textarea>
+			<p class="hint" data-i18n="sysPromptHint"></p>
 		</div>
 	</div>
 
 	<div class="item">
-		<label for="sttLang">Язык речи</label>
+		<label for="sttLang" data-i18n="sttLang"></label>
 		<div class="value">
 			<select id="sttLang">
-				<option value="ru-RU">Русский</option>
-				<option value="en-US">Английский</option>
-				<option value="auto">Автоопределение</option>
+				<option value="ru-RU" data-i18n="langRu"></option>
+				<option value="en-US" data-i18n="langEn"></option>
+				<option value="auto" data-i18n="langAuto"></option>
 			</select>
 		</div>
 	</div>
 
 	<div class="item">
-		<label for="micName">Микрофон</label>
+		<label for="micName" data-i18n="mic"></label>
 		<div class="value">
-			<select id="micName">
-				<option value="">Системный по умолчанию</option>
-			</select>
+			<select id="micName"></select>
 		</div>
 	</div>
 
 	<div class="item">
-		<label for="pressMode">Режим записи</label>
+		<label for="pressMode" data-i18n="pressMode"></label>
 		<div class="value">
 			<select id="pressMode">
-				<option value="hold" selected>Удерживать кнопку (push-to-talk)</option>
-				<option value="toggle">Нажать — старт, нажать — стоп</option>
+				<option value="hold" selected data-i18n="pmHold"></option>
+				<option value="toggle" data-i18n="pmToggle"></option>
 			</select>
 		</div>
 	</div>
@@ -188,42 +171,42 @@
 		<label></label>
 		<div class="value check">
 			<input type="checkbox" id="beeps" checked>
-			<label for="beeps" style="flex:none; text-align:left; padding:0; color:#d8d8d8;">Звуковой сигнал начала/конца записи</label>
+			<label for="beeps" data-i18n="beeps"></label>
 		</div>
 	</div>
 
 	<fieldset>
-	<legend>Ответ</legend>
+	<legend data-i18n="secResponse"></legend>
 
 	<div class="item">
-		<label for="mode">Формат ответа</label>
+		<label for="mode" data-i18n="mode"></label>
 		<div class="value">
 			<select id="mode">
-				<option value="voice">🔊 Голосом</option>
-				<option value="text">💬 Текстом (уведомление)</option>
-				<option value="both">🔊+💬 Голос и текст</option>
+				<option value="voice" data-i18n="modeVoice"></option>
+				<option value="text" data-i18n="modeText"></option>
+				<option value="both" data-i18n="modeBoth"></option>
 			</select>
 		</div>
 	</div>
 
 	<div class="item" id="rowVoice">
-		<label for="voice">Голос</label>
+		<label for="voice" data-i18n="voice"></label>
 		<div class="value">
 			<select id="voice">
-				<option value="alena">Алёна (жен.)</option>
-				<option value="marina">Марина (жен.)</option>
-				<option value="jane">Джейн (жен.)</option>
-				<option value="dasha">Даша (жен.)</option>
-				<option value="filipp">Филипп (муж.)</option>
-				<option value="alexander">Александр (муж.)</option>
-				<option value="ermil">Ермил (муж.)</option>
-				<option value="anton">Антон (муж.)</option>
+				<option value="alena" data-i18n="vAlena"></option>
+				<option value="marina" data-i18n="vMarina"></option>
+				<option value="jane" data-i18n="vJane"></option>
+				<option value="dasha" data-i18n="vDasha"></option>
+				<option value="filipp" data-i18n="vFilipp"></option>
+				<option value="alexander" data-i18n="vAlexander"></option>
+				<option value="ermil" data-i18n="vErmil"></option>
+				<option value="anton" data-i18n="vAnton"></option>
 			</select>
 		</div>
 	</div>
 
 	<div class="item" id="rowSpeed">
-		<label for="speed">Скорость</label>
+		<label for="speed" data-i18n="speed"></label>
 		<div class="value">
 			<input type="range" id="speed" min="0.5" max="2" step="0.1" value="1.0">
 			<span class="range-val" id="speedVal">1.0×</span>
@@ -231,27 +214,24 @@
 	</div>
 
 	<div class="item" id="rowSpeaker">
-		<label for="speakerName">Динамик</label>
+		<label for="speakerName" data-i18n="speaker"></label>
 		<div class="value">
-			<select id="speakerName">
-				<option value="">Системный по умолчанию</option>
-			</select>
+			<select id="speakerName"></select>
 		</div>
 	</div>
 
 	<div class="item" id="rowToastTime">
-		<label for="toastSeconds">Показ
-уведомления</label>
+		<label for="toastSeconds" data-i18n="toastTime"></label>
 		<div class="value">
 			<select id="toastSeconds">
-				<option value="3">3 секунды</option>
-				<option value="5" selected>5 секунд (стандарт)</option>
-				<option value="10">10 секунд</option>
-				<option value="15">15 секунд</option>
-				<option value="30">30 секунд</option>
-				<option value="0">Пока не закрою кликом</option>
+				<option value="3" data-i18n="t3"></option>
+				<option value="5" selected data-i18n="t5"></option>
+				<option value="10" data-i18n="t10"></option>
+				<option value="15" data-i18n="t15"></option>
+				<option value="30" data-i18n="t30"></option>
+				<option value="0" data-i18n="tClick"></option>
 			</select>
-			<p class="hint">Уведомление можно закрыть раньше — кликом по нему.</p>
+			<p class="hint" data-i18n="toastHint"></p>
 		</div>
 	</div>
 
@@ -259,56 +239,53 @@
 		<label></label>
 		<div class="value check">
 			<input type="checkbox" id="copyClipboard" checked>
-			<label for="copyClipboard" style="flex:none; text-align:left; padding:0; color:#d8d8d8;">Копировать ответ в буфер обмена</label>
+			<label for="copyClipboard" data-i18n="clip"></label>
 		</div>
 	</div>
-
 	</fieldset>
 
 	<fieldset>
-	<legend>Журнал диалогов</legend>
+	<legend data-i18n="secJournal"></legend>
 
 	<div class="item">
 		<label></label>
 		<div class="value check">
 			<input type="checkbox" id="journal" checked>
-			<label for="journal" style="flex:none; text-align:left; padding:0; color:#d8d8d8;">Записывать диалоги в файл</label>
+			<label for="journal" data-i18n="journal"></label>
 		</div>
 	</div>
 
 	<div class="item">
 		<label></label>
 		<div class="value">
-			<button id="btnJournal">📂 Открыть журнал</button>
-			<p class="hint">Файл «YandexAssistant-журнал.md» в папке «Документы»: все вопросы
-			и ответы с датой и временем.</p>
+			<button id="btnJournal" data-i18n="journalBtn"></button>
+			<p class="hint" data-i18n="journalHint"></p>
 		</div>
 	</div>
 	</fieldset>
 
 	<fieldset>
-	<legend>Память диалога</legend>
+	<legend data-i18n="secMemory"></legend>
 
 	<div class="item">
-		<label for="historySize">Помнить реплик</label>
+		<label for="historySize" data-i18n="history"></label>
 		<div class="value">
 			<select id="historySize">
-				<option value="0">Не запоминать контекст</option>
-				<option value="1">1 (только последняя)</option>
+				<option value="0" data-i18n="h0"></option>
+				<option value="1" data-i18n="h1"></option>
 				<option value="3">3</option>
-				<option value="5" selected>5 (стандарт)</option>
+				<option value="5" selected data-i18n="h5"></option>
 				<option value="10">10</option>
 				<option value="20">20</option>
 			</select>
-			<p class="hint">Сколько последних пар «вопрос → ответ» отправляется модели вместе
-			с новым вопросом. Ассистент сможет отвечать на уточнения вроде «а расскажи подробнее».</p>
+			<p class="hint" data-i18n="historyHint"></p>
 		</div>
 	</div>
 
 	<div class="item">
 		<label></label>
 		<div class="value">
-			<button id="btnClearHistory">🧹 Очистить память диалога</button>
+			<button id="btnClearHistory" data-i18n="clearBtn"></button>
 			<div id="clearResult"></div>
 		</div>
 	</div>
@@ -318,22 +295,168 @@
 	<div class="item">
 		<label></label>
 		<div class="value">
-			<button id="btnTest">Проверить подключение</button>
+			<button id="btnTest" data-i18n="testBtn"></button>
 			<div id="testResult"></div>
 		</div>
 	</div>
 	</fieldset>
 
-	<p class="hint" style="margin-top:10px">Использование: <b>удерживайте кнопку</b> и говорите, затем отпустите
-	(в режиме «нажать — старт» — нажмите один раз, скажите вопрос, нажмите ещё раз).
-	Максимум 29 секунд на вопрос.</p>
+	<p class="hint" style="margin-top:10px" data-i18n-html="usage"></p>
 </div>
 
 <script>
+// ---------------------------------------------------------------------------
+// i18n
+// ---------------------------------------------------------------------------
+const I18N = {
+	ru: {
+		apiKey: "API-ключ",
+		apiKeyHint: "API-ключ сервисного аккаунта Yandex Cloud с ролями ai.speechkit-stt.user, ai.speechkit-tts.user, ai.languageModels.user",
+		folderHint: "Идентификатор каталога в Yandex Cloud (консоль → каталог → ID)",
+		howtoBtn: "📖 Как получить API-ключ и Folder ID",
+		howtoHtml: `<ol>
+			<li>Войдите в <b>консоль Yandex Cloud</b> (нужен аккаунт Яндекса и активный платёжный аккаунт — создаётся там же, в разделе «Биллинг»).</li>
+			<li>Откройте или создайте <b>каталог</b> (folder). Его идентификатор вида <code>b1g...</code> показан в списке каталогов — скопируйте его в поле <b>Folder ID</b>.</li>
+			<li>Слева выберите <b>Сервисные аккаунты</b> → «Создать сервисный аккаунт». При создании добавьте роли: <code>ai.speechkit-stt.user</code>, <code>ai.speechkit-tts.user</code>, <code>ai.languageModels.user</code>.</li>
+			<li>Откройте созданный аккаунт → вкладка <b>«API-ключи»</b> → «Создать API-ключ». Скопируйте <b>секрет</b> (строка вида <code>AQVN...</code>) — он показывается только один раз! Вставьте его в поле <b>API-ключ</b>.</li>
+			<li>Нажмите <b>«Проверить подключение»</b> внизу этой панели.</li></ol>
+			<div class="linkrow"><button data-url="https://console.yandex.cloud/">🌐 Открыть консоль</button>
+			<button data-url="https://yandex.cloud/ru/docs/iam/operations/authentication/manage-api-keys#create-api-key">📄 Документация по API-ключам</button></div>`,
+		model: "Модель",
+		modelHint: "Все модели работают с вашим API-ключом Yandex Cloud и оплачиваются по тарифам AI Studio.",
+		gAlice: "Алиса AI", gOpen: "Открытые модели",
+		mLite: "YandexGPT 5 Lite (быстрая, дешёвая)", mPro: "YandexGPT 5 Pro",
+		m51: "YandexGPT 5.1 Pro (новейшая)", mAlice: "Алиса AI", mAliceFlash: "Алиса AI Flash (быстрая)",
+		mQwen: "Qwen3 235B (эрудит — рекомендуется)", mDeepseek: "DeepSeek V3.2 (рассуждающая, медленнее)",
+		mDeepseekFlash: "DeepSeek V4 Flash (рассуждающая)", mGptOss: "GPT-OSS 120B",
+		mCustom: "Своя модель…",
+		customModel: "Своя модель",
+		customModelHint: "Имя модели из консоли Yandex Cloud (AI Studio → Модели) или полный URI gpt://каталог/модель/latest. К короткому имени добавится /latest.",
+		sysPrompt: "Системный\nпромпт",
+		sysPromptPh: "Пусто — используется встроенный промпт: отвечать из собственных знаний, не предлагать «поискать в интернете».",
+		sysPromptHint: "Если пишете свой промпт, добавьте: «У тебя нет доступа к интернету, отвечай из собственных знаний» — иначе модель любит отказываться от ответа.",
+		sttLang: "Язык речи", langRu: "Русский", langEn: "Английский", langAuto: "Автоопределение",
+		mic: "Микрофон", pressMode: "Режим записи",
+		pmHold: "Удерживать кнопку (push-to-talk)", pmToggle: "Нажать — старт, нажать — стоп",
+		beeps: "Звуковой сигнал начала/конца записи",
+		secResponse: "Ответ", mode: "Формат ответа",
+		modeVoice: "🔊 Голосом", modeText: "💬 Текстом (уведомление)", modeBoth: "🔊+💬 Голос и текст",
+		voice: "Голос",
+		vAlena: "Алёна (жен.)", vMarina: "Марина (жен.)", vJane: "Джейн (жен.)", vDasha: "Даша (жен.)",
+		vFilipp: "Филипп (муж.)", vAlexander: "Александр (муж.)", vErmil: "Ермил (муж.)", vAnton: "Антон (муж.)",
+		speed: "Скорость", speaker: "Динамик",
+		toastTime: "Показ\nуведомления",
+		t3: "3 секунды", t5: "5 секунд (стандарт)", t10: "10 секунд", t15: "15 секунд", t30: "30 секунд",
+		tClick: "Пока не закрою кликом",
+		toastHint: "Уведомление можно закрыть раньше — кликом по нему.",
+		clip: "Копировать ответ в буфер обмена",
+		secJournal: "Журнал диалогов",
+		journal: "Записывать диалоги в файл",
+		journalBtn: "📂 Открыть журнал",
+		journalHint: "Файл в папке «Документы»: все вопросы и ответы с датой и временем.",
+		secMemory: "Память диалога",
+		history: "Помнить реплик",
+		h0: "Не запоминать контекст", h1: "1 (только последняя)", h5: "5 (стандарт)",
+		historyHint: "Сколько последних пар «вопрос → ответ» отправляется модели вместе с новым вопросом.",
+		clearBtn: "🧹 Очистить память диалога",
+		cleared: "✓ Память диалога очищена",
+		testBtn: "Проверить подключение",
+		testing: "Проверяю…",
+		usage: "Использование: <b>удерживайте кнопку</b> и говорите, затем отпустите (в режиме «нажать — старт» — нажмите, скажите вопрос, нажмите ещё раз). Максимум 29 секунд на вопрос.",
+		devDefault: "Системный по умолчанию", devMissing: " (недоступно)",
+	},
+	en: {
+		apiKey: "API key",
+		apiKeyHint: "Yandex Cloud service account API key with roles ai.speechkit-stt.user, ai.speechkit-tts.user, ai.languageModels.user",
+		folderHint: "Yandex Cloud folder ID (console → folder → ID)",
+		howtoBtn: "📖 How to get an API key and Folder ID",
+		howtoHtml: `<ol>
+			<li>Sign in to the <b>Yandex Cloud console</b> (you need a Yandex account and an active billing account — created there, in the "Billing" section).</li>
+			<li>Open or create a <b>folder</b>. Its ID like <code>b1g...</code> is shown in the folder list — copy it into the <b>Folder ID</b> field.</li>
+			<li>Go to <b>Service accounts</b> → "Create service account". Assign the roles: <code>ai.speechkit-stt.user</code>, <code>ai.speechkit-tts.user</code>, <code>ai.languageModels.user</code>.</li>
+			<li>Open the account → <b>"API keys"</b> tab → "Create API key". Copy the <b>secret</b> (a string like <code>AQVN...</code>) — it is shown only once! Paste it into the <b>API key</b> field.</li>
+			<li>Click <b>"Test connection"</b> at the bottom of this panel.</li></ol>
+			<div class="linkrow"><button data-url="https://console.yandex.cloud/">🌐 Open console</button>
+			<button data-url="https://yandex.cloud/en/docs/iam/operations/authentication/manage-api-keys#create-api-key">📄 API key documentation</button></div>`,
+		model: "Model",
+		modelHint: "All models work with your Yandex Cloud API key and are billed at AI Studio rates.",
+		gAlice: "Alice AI", gOpen: "Open models",
+		mLite: "YandexGPT 5 Lite (fast, cheap)", mPro: "YandexGPT 5 Pro",
+		m51: "YandexGPT 5.1 Pro (newest)", mAlice: "Alice AI", mAliceFlash: "Alice AI Flash (fast)",
+		mQwen: "Qwen3 235B (best knowledge — recommended)", mDeepseek: "DeepSeek V3.2 (reasoning, slower)",
+		mDeepseekFlash: "DeepSeek V4 Flash (reasoning)", mGptOss: "GPT-OSS 120B",
+		mCustom: "Custom model…",
+		customModel: "Custom model",
+		customModelHint: "Model name from the Yandex Cloud console (AI Studio → Models) or a full URI gpt://folder/model/latest. /latest is appended to short names.",
+		sysPrompt: "System\nprompt",
+		sysPromptPh: "Empty — the built-in prompt is used: answer from own knowledge, never suggest \"searching the web\".",
+		sysPromptHint: "If you write your own prompt, add: \"You have no internet access, answer from your own knowledge\" — otherwise the model tends to refuse.",
+		sttLang: "Speech language", langRu: "Russian", langEn: "English", langAuto: "Auto-detect",
+		mic: "Microphone", pressMode: "Recording mode",
+		pmHold: "Hold the key (push-to-talk)", pmToggle: "Press to start, press to stop",
+		beeps: "Beep on recording start/stop",
+		secResponse: "Response", mode: "Response format",
+		modeVoice: "🔊 Voice", modeText: "💬 Text (notification)", modeBoth: "🔊+💬 Voice and text",
+		voice: "Voice",
+		vAlena: "Alena (female)", vMarina: "Marina (female)", vJane: "Jane (female)", vDasha: "Dasha (female)",
+		vFilipp: "Filipp (male)", vAlexander: "Alexander (male)", vErmil: "Ermil (male)", vAnton: "Anton (male)",
+		speed: "Speed", speaker: "Speaker",
+		toastTime: "Notification\nduration",
+		t3: "3 seconds", t5: "5 seconds (default)", t10: "10 seconds", t15: "15 seconds", t30: "30 seconds",
+		tClick: "Until I click it",
+		toastHint: "Click the notification card to dismiss it earlier.",
+		clip: "Copy answer to clipboard",
+		secJournal: "Dialogue journal",
+		journal: "Save dialogues to a file",
+		journalBtn: "📂 Open journal",
+		journalHint: "A markdown file in your Documents folder: all questions and answers with timestamps.",
+		secMemory: "Conversation memory",
+		history: "Remember turns",
+		h0: "No context memory", h1: "1 (last only)", h5: "5 (default)",
+		historyHint: "How many recent question → answer pairs are sent to the model along with the new question.",
+		clearBtn: "🧹 Clear conversation memory",
+		cleared: "✓ Conversation memory cleared",
+		testBtn: "Test connection",
+		testing: "Testing…",
+		usage: "Usage: <b>hold the key</b> and speak, then release (in press-to-start mode — press once, ask, press again). Up to 29 seconds per question.",
+		devDefault: "System default", devMissing: " (unavailable)",
+	},
+};
+
+let lang = "en";
+function effectiveLang() {
+	const pref = settings.uiLang || "auto";
+	if (pref === "ru" || pref === "en") return pref;
+	return (navigator.language || "en").toLowerCase().startsWith("ru") ? "ru" : "en";
+}
+function t(key) { const d = I18N[lang] || I18N.en; return d[key] !== undefined ? d[key] : (I18N.en[key] !== undefined ? I18N.en[key] : key); }
+function applyI18n() {
+	lang = effectiveLang();
+	document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n); });
+	document.querySelectorAll("[data-i18n-html]").forEach((el) => { el.innerHTML = t(el.dataset.i18nHtml); });
+	document.querySelectorAll("[data-i18n-label]").forEach((el) => { el.label = t(el.dataset.i18nLabel); });
+	document.getElementById("sysPrompt").placeholder = t("sysPromptPh");
+	const howto = document.getElementById("howto");
+	const wasOpen = howto.classList.contains("open");
+	howto.innerHTML = t("howtoHtml");
+	if (wasOpen) howto.classList.add("open");
+	for (const btn of howto.querySelectorAll(".linkrow button")) {
+		btn.addEventListener("click", () => openUrl(btn.dataset.url));
+	}
+	if (lastDevices) {
+		fillDeviceSelect("micName", lastDevices.inputs || []);
+		fillDeviceSelect("speakerName", lastDevices.outputs || []);
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Stream Deck plumbing
+// ---------------------------------------------------------------------------
 let websocket = null, piUUID = null, actionUUID = null, actionContext = null;
 let settings = {};
+let lastDevices = null;
 
-const FIELDS = ["apiKey", "folderId", "model", "customModel", "sysPrompt", "sttLang", "mode", "voice", "speed", "micName", "speakerName", "historySize", "pressMode", "toastSeconds"];
+const FIELDS = ["apiKey", "folderId", "model", "customModel", "sysPrompt", "sttLang", "mode", "voice", "speed", "micName", "speakerName", "historySize", "pressMode", "toastSeconds", "uiLang"];
 const CHECKBOXES = ["copyClipboard", "beeps", "journal"]; // default: on
 
 function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, inActionInfo) {
@@ -361,13 +484,14 @@ function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, 
 			document.getElementById("btnTest").disabled = false;
 		}
 		if (msg.event === "sendToPropertyInspector" && msg.payload?.event === "devices") {
+			lastDevices = msg.payload;
 			fillDeviceSelect("micName", msg.payload.inputs || []);
 			fillDeviceSelect("speakerName", msg.payload.outputs || []);
 		}
 		if (msg.event === "sendToPropertyInspector" && msg.payload?.event === "historyCleared") {
 			const el = document.getElementById("clearResult");
 			el.className = "ok";
-			el.textContent = "✓ Память диалога очищена";
+			el.textContent = t("cleared");
 			setTimeout(() => { el.textContent = ""; }, 4000);
 		}
 	};
@@ -384,13 +508,18 @@ function openUrl(url) {
 	websocket.send(JSON.stringify({ event: "openUrl", payload: { url } }));
 }
 
+function saveSettings() {
+	if (!websocket || websocket.readyState !== 1) return;
+	websocket.send(JSON.stringify({ event: "setSettings", context: piUUID, payload: settings }));
+}
+
 function fillDeviceSelect(id, names) {
 	const el = document.getElementById(id);
 	const saved = settings[id] || "";
 	el.innerHTML = "";
 	const def = document.createElement("option");
 	def.value = "";
-	def.textContent = "Системный по умолчанию";
+	def.textContent = t("devDefault");
 	el.appendChild(def);
 	for (const name of names) {
 		const opt = document.createElement("option");
@@ -401,15 +530,10 @@ function fillDeviceSelect(id, names) {
 	if (saved && !names.includes(saved)) {
 		const opt = document.createElement("option");
 		opt.value = saved;
-		opt.textContent = saved + " (недоступно)";
+		opt.textContent = saved + t("devMissing");
 		el.appendChild(opt);
 	}
 	el.value = saved;
-}
-
-function saveSettings() {
-	if (!websocket || websocket.readyState !== 1) return;
-	websocket.send(JSON.stringify({ event: "setSettings", context: piUUID, payload: settings }));
 }
 
 function applySettingsToForm() {
@@ -420,6 +544,7 @@ function applySettingsToForm() {
 	for (const id of CHECKBOXES) {
 		document.getElementById(id).checked = settings[id] !== false;
 	}
+	applyI18n();
 	updateVisibility();
 	updateSpeedLabel();
 }
@@ -448,6 +573,7 @@ for (const id of FIELDS) {
 		settings[id] = el.value;
 		if (id === "mode" || id === "model") updateVisibility();
 		if (id === "speed") updateSpeedLabel();
+		if (id === "uiLang") applyI18n();
 		saveSettings();
 	});
 }
@@ -459,7 +585,7 @@ for (const id of CHECKBOXES) {
 }
 document.getElementById("btnTest").addEventListener("click", () => {
 	const el = document.getElementById("testResult");
-	el.className = ""; el.textContent = "Проверяю…";
+	el.className = ""; el.textContent = t("testing");
 	document.getElementById("btnTest").disabled = true;
 	sendToPlugin({ cmd: "test" });
 	setTimeout(() => { document.getElementById("btnTest").disabled = false; }, 15000);
@@ -473,9 +599,8 @@ document.getElementById("btnClearHistory").addEventListener("click", () => {
 document.getElementById("btnJournal").addEventListener("click", () => {
 	sendToPlugin({ cmd: "openJournal" });
 });
-for (const btn of document.querySelectorAll(".linkrow button")) {
-	btn.addEventListener("click", () => openUrl(btn.dataset.url));
-}
+
+applyI18n();
 </script>
 </body>
 </html>

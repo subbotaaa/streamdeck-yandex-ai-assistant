@@ -1,5 +1,7 @@
 # Yandex AI Assistant для Stream Deck
 
+**English version: [README.en.md](README.en.md)**
+
 <p align="center">
   <img src="com.subbotaaa.yandex-assistant.sdPlugin/imgs/plugin%402x.png" width="128" alt="Yandex AI Assistant icon">
 </p>
@@ -41,7 +43,7 @@
 ## Требования
 
 - Windows 10/11
-- [Stream Deck](https://www.elgato.com/downloads) 6.5+ (проверено на 7.1)
+- [Stream Deck](https://www.elgato.com/downloads) 6.9+ (проверено на 7.1)
 - Аккаунт [Yandex Cloud](https://console.yandex.cloud/) с активным платёжным аккаунтом
 
 ## Установка

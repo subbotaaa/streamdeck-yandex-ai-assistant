@@ -5,7 +5,7 @@
 	"Version": "1.0.0.0",
 	"Author": "subbotaaa",
 	"URL": "https://github.com/subbotaaa/streamdeck-yandex-ai-assistant",
-	"Description": "Голосовой ИИ-ассистент на Yandex Cloud: удерживайте кнопку и говорите — ответ YandexGPT придёт голосом или текстом.",
+	"Description": "Push-to-talk AI voice assistant powered by Yandex Cloud: hold the key and speak — get an answer from YandexGPT, Alice AI, Qwen or DeepSeek as voice or text. Russian and English UI.",
 	"Category": "Yandex AI Assistant",
 	"CategoryIcon": "imgs/category",
 	"Icon": "imgs/plugin",
@@ -25,10 +25,10 @@
 	],
 	"Actions": [
 		{
-			"Name": "Голосовой ассистент",
+			"Name": "Voice Assistant",
 			"UUID": "com.subbotaaa.yandex-assistant.ask",
 			"Icon": "imgs/action",
-			"Tooltip": "Удерживайте кнопку и говорите. Отпустите — получите ответ YandexGPT.",
+			"Tooltip": "Hold the key and speak. Release to get an AI answer as voice or text.",
 			"PropertyInspectorPath": "ui/pi.html",
 			"Controllers": [
 				"Keypad"
