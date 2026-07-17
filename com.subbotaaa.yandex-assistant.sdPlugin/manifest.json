@@ -1,0 +1,43 @@
+{
+	"$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
+	"Name": "Yandex AI Assistant",
+	"Version": "1.0.0.0",
+	"Author": "subbotaaa",
+	"URL": "https://github.com/subbotaaa/streamdeck-yandex-ai-assistant",
+	"Description": "Голосовой ИИ-ассистент на Yandex Cloud: удерживайте кнопку и говорите — ответ YandexGPT придёт голосом или текстом.",
+	"Category": "Yandex AI",
+	"CategoryIcon": "imgs/category",
+	"Icon": "imgs/plugin",
+	"CodePath": "bin/plugin.js",
+	"SDKVersion": 2,
+	"Nodejs": {
+		"Version": "20"
+	},
+	"Software": {
+		"MinimumVersion": "6.5"
+	},
+	"OS": [
+		{
+			"Platform": "windows",
+			"MinimumVersion": "10"
+		}
+	],
+	"Actions": [
+		{
+			"Name": "Голосовой ассистент",
+			"UUID": "com.subbotaaa.yandex-assistant.ask",
+			"Icon": "imgs/action",
+			"Tooltip": "Удерживайте кнопку и говорите. Отпустите — получите ответ YandexGPT.",
+			"PropertyInspectorPath": "ui/pi.html",
+			"Controllers": [ "Keypad" ],
+			"SupportedInMultiActions": false,
+			"UserTitleEnabled": false,
+			"States": [
+				{
+					"Image": "imgs/action",
+					"TitleAlignment": "bottom"
+				}
+			]
+		}
+	]
+}

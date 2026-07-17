@@ -1,0 +1,6 @@
+node_modules/
+*.log
+.claude/
+com.mirap.yandex-assistant.sdPlugin/
+*.streamDeckPlugin
+dist/

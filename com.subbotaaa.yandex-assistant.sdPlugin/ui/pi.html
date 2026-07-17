@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Yandex AI Assistant — настройки</title>
+<style>
+	:root { color-scheme: dark; }
+	html, body {
+		margin: 0; padding: 0;
+		background: #2d2d2d; color: #d8d8d8;
+		font-family: "Segoe UI", system-ui, sans-serif;
+		font-size: 9pt;
+		-webkit-user-select: none; user-select: none;
+	}
+	.wrapper { padding: 6px 10px 12px; }
+	.item { display: flex; align-items: flex-start; margin: 7px 0; }
+	.item > label {
+		flex: 0 0 94px; text-align: right; padding: 4px 8px 0 0;
+		color: #969696; white-space: pre-line;
+	}
+	.item > .value { flex: 1; min-width: 0; }
+	input[type=text], input[type=password], select, textarea {
+		width: 100%; box-sizing: border-box;
+		background: #3d3d3d; color: #e6e6e6;
+		border: 1px solid #232323; border-radius: 4px;
+		padding: 5px 6px; font-size: 9pt; font-family: inherit;
+		outline: none;
+	}
+	input:focus, select:focus, textarea:focus { border-color: #4e8cf0; }
+	textarea { resize: vertical; min-height: 44px; -webkit-user-select: text; user-select: text; }
+	input[type=range] { width: calc(100% - 44px); vertical-align: middle; }
+	.range-val { display: inline-block; width: 36px; text-align: right; color: #bdbdbd; }
+	.check { display: flex; align-items: center; gap: 6px; padding-top: 3px; }
+	.hint { color: #7a7a7a; font-size: 8pt; margin: 2px 0 0; line-height: 1.35; }
+	.hint a { color: #6ea3f5; text-decoration: none; }
+	button {
+		background: #3d3d3d; color: #e6e6e6; border: 1px solid #232323;
+		border-radius: 4px; padding: 5px 14px; cursor: pointer; font-size: 9pt;
+	}
+	button:hover { background: #464646; }
+	#testResult, #clearResult { margin-top: 6px; font-size: 8.5pt; line-height: 1.35; white-space: pre-wrap; -webkit-user-select: text; user-select: text; }
+	#testResult.ok, #clearResult.ok { color: #7ec87e; }
+	#testResult.err { color: #e08a8a; }
+	#howto {
+		display: none; margin: 8px 0 4px; padding: 10px 12px;
+		background: #262626; border: 1px solid #3a3a3a; border-radius: 6px;
+		font-size: 8.5pt; line-height: 1.5; color: #c9c9c9;
+	}
+	#howto.open { display: block; }
+	#howto ol { margin: 4px 0 8px; padding-left: 18px; }
+	#howto li { margin: 4px 0; }
+	#howto code {
+		background: #333; border-radius: 3px; padding: 1px 4px;
+		font-family: Consolas, monospace; font-size: 8pt; color: #e0d7a8;
+		-webkit-user-select: text; user-select: text;
+	}
+	.linkrow { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+	.linkrow button { font-size: 8.5pt; padding: 4px 10px; }
+	fieldset { border: none; border-top: 1px solid #3a3a3a; margin: 12px 0 0; padding: 8px 0 0; }
+	legend { color: #8a8a8a; padding: 0 6px 0 0; font-size: 8.5pt; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+	<div class="item">
+		<label for="apiKey">API-ключ</label>
+		<div class="value">
+			<input type="password" id="apiKey" placeholder="AQVN...">
+			<p class="hint">API-ключ сервисного аккаунта Yandex Cloud с ролями
+			ai.speechkit-stt.user, ai.speechkit-tts.user, ai.languageModels.user</p>
+		</div>
+	</div>
+
+	<div class="item">
+		<label for="folderId">Folder ID</label>
+		<div class="value">
+			<input type="text" id="folderId" placeholder="b1g...">
+			<p class="hint">Идентификатор каталога в Yandex Cloud (консоль → каталог → ID)</p>
+		</div>
+	</div>
+
+	<div class="item">
+		<label></label>
+		<div class="value">
+			<button id="btnHowto">📖 Как получить API-ключ и Folder ID</button>
+			<div id="howto">
+				<ol>
+					<li>Войдите в <b>консоль Yandex Cloud</b> (нужен аккаунт Яндекса и активный
+						платёжный аккаунт — создаётся там же, в разделе «Биллинг»).</li>
+					<li>Откройте или создайте <b>каталог</b> (folder). Его идентификатор вида
+						<code>b1g...</code> показан в списке каталогов и в адресной строке —
+						скопируйте его в поле <b>Folder ID</b>.</li>
+					<li>Слева выберите <b>Сервисные аккаунты</b> → «Создать сервисный аккаунт».
+						При создании добавьте роли:
+						<code>ai.speechkit-stt.user</code>, <code>ai.speechkit-tts.user</code>,
+						<code>ai.languageModels.user</code>.</li>
+					<li>Откройте созданный аккаунт → вкладка <b>«API-ключи»</b> →
+						«Создать API-ключ». Скопируйте <b>секрет</b> (строка вида
+						<code>AQVN...</code>) — он показывается только один раз! Вставьте его
+						в поле <b>API-ключ</b>.</li>
+					<li>Нажмите <b>«Проверить подключение»</b> внизу этой панели.</li>
+				</ol>
+				<div class="linkrow">
+					<button data-url="https://console.yandex.cloud/">🌐 Открыть консоль</button>
+					<button data-url="https://yandex.cloud/ru/docs/iam/operations/authentication/manage-api-keys#create-api-key">📄 Документация по API-ключам</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="item">
+		<label for="model">Модель</label>
+		<div class="value">
+			<select id="model">
+				<optgroup label="YandexGPT">
+					<option value="yandexgpt-lite" selected>YandexGPT 5 Lite (быстрая, дешёвая)</option>
+					<option value="yandexgpt">YandexGPT 5 Pro</option>
+					<option value="yandexgpt-5.1">YandexGPT 5.1 Pro (новейшая)</option>
+				</optgroup>
+				<optgroup label="Алиса AI">
+					<option value="aliceai-llm">Алиса AI</option>
+					<option value="aliceai-llm-flash">Алиса AI Flash (быстрая)</option>
+				</optgroup>
+				<optgroup label="Открытые модели">
+					<option value="qwen3-235b-a22b-fp8">Qwen3 235B (эрудит — рекомендуется)</option>
+					<option value="deepseek-v32">DeepSeek V3.2 (рассуждающая, медленнее)</option>
+					<option value="deepseek-v4-flash">DeepSeek V4 Flash (рассуждающая)</option>
+					<option value="gpt-oss-120b">GPT-OSS 120B</option>
+				</optgroup>
+				<option value="custom">Своя модель…</option>
+			</select>
+			<p class="hint">Все модели работают с вашим API-ключом Yandex Cloud и оплачиваются
+			по тарифам Foundation Models / AI Studio.</p>
+		</div>
+	</div>
+
+	<div class="item" id="rowCustomModel" style="display:none">
+		<label for="customModel">Своя модель</label>
+		<div class="value">
+			<input type="text" id="customModel" placeholder="qwen3.6-35b-a3b или gpt://каталог/модель/latest">
+			<p class="hint">Имя модели из консоли Yandex Cloud (раздел AI Studio → Модели)
+			или полный URI. К короткому имени автоматически добавится /latest.</p>
+		</div>
+	</div>
+
+	<div class="item">
+		<label for="sysPrompt">Системный
+промпт</label>
+		<div class="value">
+			<textarea id="sysPrompt" placeholder="Пусто — используется встроенный промпт: отвечать из собственных знаний, не предлагать «поискать в интернете»."></textarea>
+			<p class="hint">Если пишете свой промпт, добавьте в него: «У тебя нет доступа к интернету,
+			отвечай из собственных знаний» — иначе модель любит отказываться от ответа.</p>
+		</div>
+	</div>
+
+	<div class="item">
+		<label for="sttLang">Язык речи</label>
+		<div class="value">
+			<select id="sttLang">
+				<option value="ru-RU">Русский</option>
+				<option value="en-US">Английский</option>
+				<option value="auto">Автоопределение</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="item">
+		<label for="micName">Микрофон</label>
+		<div class="value">
+			<select id="micName">
+				<option value="">Системный по умолчанию</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="item">
+		<label for="pressMode">Режим записи</label>
+		<div class="value">
+			<select id="pressMode">
+				<option value="hold" selected>Удерживать кнопку (push-to-talk)</option>
+				<option value="toggle">Нажать — старт, нажать — стоп</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="item">
+		<label></label>
+		<div class="value check">
+			<input type="checkbox" id="beeps" checked>
+			<label for="beeps" style="flex:none; text-align:left; padding:0; color:#d8d8d8;">Звуковой сигнал начала/конца записи</label>
+		</div>
+	</div>
+
+	<fieldset>
+	<legend>Ответ</legend>
+
+	<div class="item">
+		<label for="mode">Формат ответа</label>
+		<div class="value">
+			<select id="mode">
+				<option value="voice">🔊 Голосом</option>
+				<option value="text">💬 Текстом (уведомление)</option>
+				<option value="both">🔊+💬 Голос и текст</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="item" id="rowVoice">
+		<label for="voice">Голос</label>
+		<div class="value">
+			<select id="voice">
+				<option value="alena">Алёна (жен.)</option>
+				<option value="marina">Марина (жен.)</option>
+				<option value="jane">Джейн (жен.)</option>
+				<option value="dasha">Даша (жен.)</option>
+				<option value="filipp">Филипп (муж.)</option>
+				<option value="alexander">Александр (муж.)</option>
+				<option value="ermil">Ермил (муж.)</option>
+				<option value="anton">Антон (муж.)</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="item" id="rowSpeed">
+		<label for="speed">Скорость</label>
+		<div class="value">
+			<input type="range" id="speed" min="0.5" max="2" step="0.1" value="1.0">
+			<span class="range-val" id="speedVal">1.0×</span>
+		</div>
+	</div>
+
+	<div class="item" id="rowSpeaker">
+		<label for="speakerName">Динамик</label>
+		<div class="value">
+			<select id="speakerName">
+				<option value="">Системный по умолчанию</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="item" id="rowToastTime">
+		<label for="toastSeconds">Показ
+уведомления</label>
+		<div class="value">
+			<select id="toastSeconds">
+				<option value="3">3 секунды</option>
+				<option value="5" selected>5 секунд (стандарт)</option>
+				<option value="10">10 секунд</option>
+				<option value="15">15 секунд</option>
+				<option value="30">30 секунд</option>
+				<option value="0">Пока не закрою кликом</option>
+			</select>
+			<p class="hint">Уведомление можно закрыть раньше — кликом по нему.</p>
+		</div>
+	</div>
+
+	<div class="item" id="rowClip">
+		<label></label>
+		<div class="value check">
+			<input type="checkbox" id="copyClipboard" checked>
+			<label for="copyClipboard" style="flex:none; text-align:left; padding:0; color:#d8d8d8;">Копировать ответ в буфер обмена</label>
+		</div>
+	</div>
+
+	</fieldset>
+
+	<fieldset>
+	<legend>Журнал диалогов</legend>
+
+	<div class="item">
+		<label></label>
+		<div class="value check">
+			<input type="checkbox" id="journal" checked>
+			<label for="journal" style="flex:none; text-align:left; padding:0; color:#d8d8d8;">Записывать диалоги в файл</label>
+		</div>
+	</div>
+
+	<div class="item">
+		<label></label>
+		<div class="value">
+			<button id="btnJournal">📂 Открыть журнал</button>
+			<p class="hint">Файл «YandexAssistant-журнал.md» в папке «Документы»: все вопросы
+			и ответы с датой и временем.</p>
+		</div>
+	</div>
+	</fieldset>
+
+	<fieldset>
+	<legend>Память диалога</legend>
+
+	<div class="item">
+		<label for="historySize">Помнить реплик</label>
+		<div class="value">
+			<select id="historySize">
+				<option value="0">Не запоминать контекст</option>
+				<option value="1">1 (только последняя)</option>
+				<option value="3">3</option>
+				<option value="5" selected>5 (стандарт)</option>
+				<option value="10">10</option>
+				<option value="20">20</option>
+			</select>
+			<p class="hint">Сколько последних пар «вопрос → ответ» отправляется модели вместе
+			с новым вопросом. Ассистент сможет отвечать на уточнения вроде «а расскажи подробнее».</p>
+		</div>
+	</div>
+
+	<div class="item">
+		<label></label>
+		<div class="value">
+			<button id="btnClearHistory">🧹 Очистить память диалога</button>
+			<div id="clearResult"></div>
+		</div>
+	</div>
+	</fieldset>
+
+	<fieldset>
+	<div class="item">
+		<label></label>
+		<div class="value">
+			<button id="btnTest">Проверить подключение</button>
+			<div id="testResult"></div>
+		</div>
+	</div>
+	</fieldset>
+
+	<p class="hint" style="margin-top:10px">Использование: <b>удерживайте кнопку</b> и говорите, затем отпустите
+	(в режиме «нажать — старт» — нажмите один раз, скажите вопрос, нажмите ещё раз).
+	Максимум 29 секунд на вопрос.</p>
+</div>
+
+<script>
+let websocket = null, piUUID = null, actionUUID = null, actionContext = null;
+let settings = {};
+
+const FIELDS = ["apiKey", "folderId", "model", "customModel", "sysPrompt", "sttLang", "mode", "voice", "speed", "micName", "speakerName", "historySize", "pressMode", "toastSeconds"];
+const CHECKBOXES = ["copyClipboard", "beeps", "journal"]; // default: on
+
+function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, inActionInfo) {
+	piUUID = inUUID;
+	const actionInfo = JSON.parse(inActionInfo);
+	actionUUID = actionInfo.action;
+	actionContext = actionInfo.context;
+	settings = actionInfo.payload?.settings || {};
+
+	websocket = new WebSocket("ws://127.0.0.1:" + inPort);
+	websocket.onopen = () => {
+		websocket.send(JSON.stringify({ event: inRegisterEvent, uuid: inUUID }));
+		sendToPlugin({ cmd: "getDevices" });
+	};
+	websocket.onmessage = (evt) => {
+		const msg = JSON.parse(evt.data);
+		if (msg.event === "didReceiveSettings") {
+			settings = msg.payload?.settings || {};
+			applySettingsToForm();
+		}
+		if (msg.event === "sendToPropertyInspector" && msg.payload?.event === "testResult") {
+			const el = document.getElementById("testResult");
+			el.className = msg.payload.ok ? "ok" : "err";
+			el.textContent = (msg.payload.ok ? "✓ " : "✗ ") + msg.payload.message;
+			document.getElementById("btnTest").disabled = false;
+		}
+		if (msg.event === "sendToPropertyInspector" && msg.payload?.event === "devices") {
+			fillDeviceSelect("micName", msg.payload.inputs || []);
+			fillDeviceSelect("speakerName", msg.payload.outputs || []);
+		}
+		if (msg.event === "sendToPropertyInspector" && msg.payload?.event === "historyCleared") {
+			const el = document.getElementById("clearResult");
+			el.className = "ok";
+			el.textContent = "✓ Память диалога очищена";
+			setTimeout(() => { el.textContent = ""; }, 4000);
+		}
+	};
+	applySettingsToForm();
+}
+
+function sendToPlugin(payload) {
+	if (!websocket || websocket.readyState !== 1) return;
+	websocket.send(JSON.stringify({ action: actionUUID, event: "sendToPlugin", context: piUUID, payload }));
+}
+
+function openUrl(url) {
+	if (!websocket || websocket.readyState !== 1) return;
+	websocket.send(JSON.stringify({ event: "openUrl", payload: { url } }));
+}
+
+function fillDeviceSelect(id, names) {
+	const el = document.getElementById(id);
+	const saved = settings[id] || "";
+	el.innerHTML = "";
+	const def = document.createElement("option");
+	def.value = "";
+	def.textContent = "Системный по умолчанию";
+	el.appendChild(def);
+	for (const name of names) {
+		const opt = document.createElement("option");
+		opt.value = name;
+		opt.textContent = name;
+		el.appendChild(opt);
+	}
+	if (saved && !names.includes(saved)) {
+		const opt = document.createElement("option");
+		opt.value = saved;
+		opt.textContent = saved + " (недоступно)";
+		el.appendChild(opt);
+	}
+	el.value = saved;
+}
+
+function saveSettings() {
+	if (!websocket || websocket.readyState !== 1) return;
+	websocket.send(JSON.stringify({ event: "setSettings", context: piUUID, payload: settings }));
+}
+
+function applySettingsToForm() {
+	for (const id of FIELDS) {
+		const el = document.getElementById(id);
+		if (el && settings[id] !== undefined) el.value = settings[id];
+	}
+	for (const id of CHECKBOXES) {
+		document.getElementById(id).checked = settings[id] !== false;
+	}
+	updateVisibility();
+	updateSpeedLabel();
+}
+
+function updateVisibility() {
+	const mode = document.getElementById("mode").value;
+	const voiceOn = mode === "voice" || mode === "both";
+	const textOn = mode === "text" || mode === "both";
+	document.getElementById("rowCustomModel").style.display =
+		document.getElementById("model").value === "custom" ? "" : "none";
+	document.getElementById("rowVoice").style.display = voiceOn ? "" : "none";
+	document.getElementById("rowSpeed").style.display = voiceOn ? "" : "none";
+	document.getElementById("rowSpeaker").style.display = voiceOn ? "" : "none";
+	document.getElementById("rowToastTime").style.display = textOn ? "" : "none";
+	document.getElementById("rowClip").style.display = textOn ? "" : "none";
+}
+
+function updateSpeedLabel() {
+	document.getElementById("speedVal").textContent =
+		Number(document.getElementById("speed").value).toFixed(1) + "×";
+}
+
+for (const id of FIELDS) {
+	const el = document.getElementById(id);
+	el.addEventListener("input", () => {
+		settings[id] = el.value;
+		if (id === "mode" || id === "model") updateVisibility();
+		if (id === "speed") updateSpeedLabel();
+		saveSettings();
+	});
+}
+for (const id of CHECKBOXES) {
+	document.getElementById(id).addEventListener("change", (e) => {
+		settings[id] = e.target.checked;
+		saveSettings();
+	});
+}
+document.getElementById("btnTest").addEventListener("click", () => {
+	const el = document.getElementById("testResult");
+	el.className = ""; el.textContent = "Проверяю…";
+	document.getElementById("btnTest").disabled = true;
+	sendToPlugin({ cmd: "test" });
+	setTimeout(() => { document.getElementById("btnTest").disabled = false; }, 15000);
+});
+document.getElementById("btnHowto").addEventListener("click", () => {
+	document.getElementById("howto").classList.toggle("open");
+});
+document.getElementById("btnClearHistory").addEventListener("click", () => {
+	sendToPlugin({ cmd: "clearHistory" });
+});
+document.getElementById("btnJournal").addEventListener("click", () => {
+	sendToPlugin({ cmd: "openJournal" });
+});
+for (const btn of document.querySelectorAll(".linkrow button")) {
+	btn.addEventListener("click", () => openUrl(btn.dataset.url));
+}
+</script>
+</body>
+</html>

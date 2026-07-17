@@ -1,0 +1,10 @@
+{
+	"name": "com.subbotaaa.yandex-assistant",
+	"version": "1.0.0",
+	"private": true,
+	"type": "module",
+	"description": "Stream Deck voice assistant powered by Yandex SpeechKit + YandexGPT",
+	"dependencies": {
+		"ws": "^8.18.0"
+	}
+}
